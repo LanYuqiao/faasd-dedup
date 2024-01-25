@@ -16,6 +16,7 @@ func init() {
 	rootCommand.AddCommand(installCmd)
 	rootCommand.AddCommand(makeProviderCmd())
 	rootCommand.AddCommand(collectCmd)
+	rootCommand.AddCommand(makeDedupControllerCmd())
 }
 
 func RootCommand() *cobra.Command {

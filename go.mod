@@ -1,4 +1,4 @@
-module github.com/openfaas/faasd
+module github.com/lanyuqiao/faasd-dedup
 
 go 1.21
 

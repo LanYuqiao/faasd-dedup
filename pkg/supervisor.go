@@ -20,8 +20,8 @@ import (
 	"github.com/containerd/containerd/oci"
 	gocni "github.com/containerd/go-cni"
 	"github.com/docker/distribution/reference"
-	"github.com/openfaas/faasd/pkg/cninetwork"
-	"github.com/openfaas/faasd/pkg/service"
+	"github.com/lanyuqiao/faasd-dedup/pkg/cninetwork"
+	"github.com/lanyuqiao/faasd-dedup/pkg/service"
 	"github.com/pkg/errors"
 
 	"github.com/containerd/containerd/namespaces"
