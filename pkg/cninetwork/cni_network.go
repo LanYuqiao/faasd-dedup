@@ -215,6 +215,16 @@ func CNIGateway() (string, error) {
 	return ip.String(), nil
 }
 
+func CNIDedupAddr() (string, error) {
+	ip, _, err := net.ParseCIDR(defaultSubnet)
+	if err != nil {
+		return "", fmt.Errorf("error formatting gateway for network %s", defaultSubnet)
+	}
+	ip = ip.To4()
+	ip[3] = 2
+	return ip.String(), nil
+}
+
 // netID generates the network IF based on task name and task PID
 func netID(task containerd.Task) string {
 	return fmt.Sprintf("%s-%d", task.ID(), task.Pid())

@@ -11,6 +11,8 @@ import (
 	"path"
 	"time"
 
+	cninetwork "github.com/Lanyuqiao/faasd-dedup/pkg/cninetwork"
+	"github.com/Lanyuqiao/faasd-dedup/pkg/service"
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/cio"
 	"github.com/containerd/containerd/containers"
@@ -18,8 +20,6 @@ import (
 	"github.com/containerd/containerd/oci"
 	gocni "github.com/containerd/go-cni"
 	"github.com/docker/distribution/reference"
-	cninetwork "github.com/lanyuqiao/faasd-dedup/pkg/cninetwork"
-	"github.com/lanyuqiao/faasd-dedup/pkg/service"
 	"github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/openfaas/faas-provider/types"
 	"github.com/pkg/errors"

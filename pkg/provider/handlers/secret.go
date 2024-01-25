@@ -10,7 +10,7 @@ import (
 	"path"
 	"strings"
 
-	provider "github.com/lanyuqiao/faasd-dedup/pkg/provider"
+	provider "github.com/Lanyuqiao/faasd-dedup/pkg/provider"
 	"github.com/openfaas/faas-provider/types"
 )
 

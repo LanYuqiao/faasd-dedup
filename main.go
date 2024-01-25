@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lanyuqiao/faasd-dedup/cmd"
+	"github.com/Lanyuqiao/faasd-dedup/cmd"
 )
 
 // These values will be injected into these variables at the build time.

@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Lanyuqiao/faasd-dedup/pkg/cninetwork"
+	"github.com/Lanyuqiao/faasd-dedup/pkg/service"
 	"github.com/alexellis/arkade/pkg/env"
 	"github.com/compose-spec/compose-go/loader"
 	compose "github.com/compose-spec/compose-go/types"
@@ -20,8 +22,6 @@ import (
 	"github.com/containerd/containerd/oci"
 	gocni "github.com/containerd/go-cni"
 	"github.com/docker/distribution/reference"
-	"github.com/lanyuqiao/faasd-dedup/pkg/cninetwork"
-	"github.com/lanyuqiao/faasd-dedup/pkg/service"
 	"github.com/pkg/errors"
 
 	"github.com/containerd/containerd/namespaces"
@@ -98,9 +98,14 @@ func (s *Supervisor) Start(svcs []Service) error {
 	if err != nil {
 		return err
 	}
+	dd, err := cninetwork.CNIDedupAddr()
+	if err != nil {
+		return err
+	}
 	hosts := fmt.Sprintf(`
 127.0.0.1	localhost
-%s	faasd-provider`, gw)
+%s	faasd-provider
+%s	dedup-controller`, gw, dd)
 
 	writeHostsErr := ioutil.WriteFile(path.Join(wd, "hosts"),
 		[]byte(hosts), workingDirectoryPermission)

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/lanyuqiao/faasd-dedup/pkg"
-	faasd "github.com/lanyuqiao/faasd-dedup/pkg"
-	provider "github.com/lanyuqiao/faasd-dedup/pkg/provider"
+	"github.com/Lanyuqiao/faasd-dedup/pkg"
+	faasd "github.com/Lanyuqiao/faasd-dedup/pkg"
+	provider "github.com/Lanyuqiao/faasd-dedup/pkg/provider"
 )
 
 func getRequestNamespace(namespace string) string {

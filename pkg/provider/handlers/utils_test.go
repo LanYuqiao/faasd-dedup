@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	faasd "github.com/lanyuqiao/faasd-dedup/pkg"
+	faasd "github.com/Lanyuqiao/faasd-dedup/pkg"
 )
 
 func Test_getRequestNamespace(t *testing.T) {

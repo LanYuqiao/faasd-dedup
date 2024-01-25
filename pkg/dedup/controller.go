@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func receiveLSOF(w http.ResponseWriter, r *http.Request) {
+func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 	// 从请求体中读取数据
 	data, err := io.ReadAll(r.Body)
 	if err != nil {

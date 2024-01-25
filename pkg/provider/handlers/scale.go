@@ -12,7 +12,7 @@ import (
 	"github.com/containerd/containerd/namespaces"
 	gocni "github.com/containerd/go-cni"
 
-	"github.com/lanyuqiao/faasd-dedup/pkg"
+	"github.com/Lanyuqiao/faasd-dedup/pkg"
 	"github.com/openfaas/faas-provider/types"
 )
 

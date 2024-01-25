@@ -3,7 +3,7 @@ package pkg
 import (
 	"log"
 
-	"github.com/lanyuqiao/faasd-dedup/pkg/depgraph"
+	"github.com/Lanyuqiao/faasd-dedup/pkg/depgraph"
 )
 
 func buildDeploymentOrder(svcs []Service) []string {

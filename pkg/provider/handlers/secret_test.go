@@ -12,8 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanyuqiao/faasd-dedup/pkg"
-	provider "github.com/lanyuqiao/faasd-dedup/pkg/provider"
+	"github.com/Lanyuqiao/faasd-dedup/pkg"
+	provider "github.com/Lanyuqiao/faasd-dedup/pkg/provider"
 	"github.com/openfaas/faas-provider/types"
 )
 

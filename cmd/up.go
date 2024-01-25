@@ -16,8 +16,8 @@ import (
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 
+	"github.com/Lanyuqiao/faasd-dedup/pkg"
 	units "github.com/docker/go-units"
-	"github.com/lanyuqiao/faasd-dedup/pkg"
 )
 
 // upConfig are the CLI flags used by the `faasd up` command to deploy the faasd service

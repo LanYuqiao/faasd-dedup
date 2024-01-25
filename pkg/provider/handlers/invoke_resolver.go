@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strings"
 
+	faasd "github.com/Lanyuqiao/faasd-dedup/pkg"
 	"github.com/containerd/containerd"
-	faasd "github.com/lanyuqiao/faasd-dedup/pkg"
 )
 
 const watchdogPort = 8080

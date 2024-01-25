@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	systemd "github.com/lanyuqiao/faasd-dedup/pkg/systemd"
+	systemd "github.com/Lanyuqiao/faasd-dedup/pkg/systemd"
 	"github.com/pkg/errors"
 
 	"github.com/spf13/cobra"

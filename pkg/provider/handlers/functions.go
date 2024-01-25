@@ -10,11 +10,11 @@ import (
 
 	"github.com/opencontainers/runtime-spec/specs-go"
 
+	"github.com/Lanyuqiao/faasd-dedup/pkg"
+	faasd "github.com/Lanyuqiao/faasd-dedup/pkg"
+	"github.com/Lanyuqiao/faasd-dedup/pkg/cninetwork"
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/namespaces"
-	"github.com/lanyuqiao/faasd-dedup/pkg"
-	faasd "github.com/lanyuqiao/faasd-dedup/pkg"
-	"github.com/lanyuqiao/faasd-dedup/pkg/cninetwork"
 )
 
 type Function struct {

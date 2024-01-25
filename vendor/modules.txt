@@ -535,3 +535,5 @@ gopkg.in/yaml.v2
 # k8s.io/apimachinery v0.29.0
 ## explicit; go 1.21
 k8s.io/apimachinery/pkg/api/resource
+# github.com/Lanyuqiao/faasd-dedup/pkg/dedup => ../pkg/dedup
+# github.com/Lanyuqiao/faasd-dedup/cmd => ./cmd

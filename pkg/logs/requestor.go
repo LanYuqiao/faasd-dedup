@@ -13,7 +13,7 @@ import (
 
 	"github.com/openfaas/faas-provider/logs"
 
-	faasd "github.com/lanyuqiao/faasd-dedup/pkg"
+	faasd "github.com/Lanyuqiao/faasd-dedup/pkg"
 )
 
 type requester struct{}
