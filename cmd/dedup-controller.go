@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Lanyuqiao/faasd-dedup/pkg/cninetwork"
 	"github.com/Lanyuqiao/faasd-dedup/pkg/dedup"
 	"github.com/spf13/cobra"
 )
@@ -25,15 +24,10 @@ func makeDedupControllerCmd() *cobra.Command {
 
 func runDedupE(cmd *cobra.Command, _ []string) error {
 
-	_, err := cninetwork.InitNetwork()
-	if err != nil {
-		log.Print("Fail to init cninetwork for dedup controller")
-		return err
-	}
 	http.HandleFunc("/receive-lsof", dedup.ReceiveLSOF)
 	port := 12345
 	log.Printf("Dedup service listening on 0.0.0.0:%d", port)
-	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {
 		log.Print("Error when starting dedup controller", err)
 	}

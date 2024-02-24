@@ -98,14 +98,9 @@ func (s *Supervisor) Start(svcs []Service) error {
 	if err != nil {
 		return err
 	}
-	dd, err := cninetwork.CNIDedupAddr()
-	if err != nil {
-		return err
-	}
 	hosts := fmt.Sprintf(`
 127.0.0.1	localhost
-%s	faasd-provider
-%s	dedup-controller`, gw, dd)
+%s	faasd-provider`, gw)
 
 	writeHostsErr := ioutil.WriteFile(path.Join(wd, "hosts"),
 		[]byte(hosts), workingDirectoryPermission)
