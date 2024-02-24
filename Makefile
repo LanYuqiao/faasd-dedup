@@ -27,8 +27,8 @@ dist-local:
 .PHONY: dist
 dist:
 	CGO_ENABLED=0 GOOS=linux go build -mod=vendor -ldflags $(LDFLAGS) -o bin/faasd
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -mod=vendor -ldflags $(LDFLAGS) -o bin/faasd-armhf
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod=vendor -ldflags $(LDFLAGS) -o bin/faasd-arm64
+	# CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -mod=vendor -ldflags $(LDFLAGS) -o bin/faasd-armhf
+	# CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod=vendor -ldflags $(LDFLAGS) -o bin/faasd-arm64
 
 .PHONY: hashgen
 hashgen:
