@@ -1,6 +1,7 @@
 package dedup
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -59,13 +60,14 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 						var wg sync.WaitGroup
 						wg.Add(len(ns))
 						for _, n := range inodes {
-							var b []byte
+							var b bytes.Buffer
 							var err error
 
-							go func(node string, buf *[]byte) {
+							go func(node string, buf *bytes.Buffer) {
 								defer wg.Done()
 								cmd := exec.Command("find", SnapshotsPath, "-inum", node)
-								*buf, err = cmd.Output()
+								cmd.Stdout = buf
+								err = cmd.Run()
 								if err != nil {
 									log.Printf("Error when running find -inum %s", node)
 								}
@@ -73,7 +75,7 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 
 							}(n, &b)
 							// log.Printf("inode: %s, hostpath: %s", n, string(b))
-							hostpaths = append(hostpaths, string(b))
+							hostpaths = append(hostpaths, b.String())
 
 						}
 						wg.Wait()
