@@ -55,16 +55,29 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 				if len(ns) > 1 {
 					log.Printf("Found more than one inode at path: %s, dedup triggered", cpath)
 					go func(inodes []string) {
+						var hostpaths []string
+						var wg sync.WaitGroup
+						wg.Add(len(ns))
 						for _, n := range inodes {
-							go func(node string) {
+							var b []byte
+							var err error
+
+							go func(node string, buf *[]byte) {
+								defer wg.Done()
 								cmd := exec.Command("find", SnapshotsPath, "-inum", node)
-								b, err := cmd.Output()
+								*buf, err = cmd.Output()
 								if err != nil {
 									log.Printf("Error when running find -inum %s", node)
 								}
-								log.Printf("inode: %s, hostpath: %s", node, string(b))
-							}(n)
+								// log.Printf("inode: %s, hostpath: %s", node, string(b))
+
+							}(n, &b)
+							// log.Printf("inode: %s, hostpath: %s", n, string(b))
+							hostpaths = append(hostpaths, string(b))
+
 						}
+						wg.Wait()
+						log.Printf("cpath: %s\thostpaths: %v", cpath, hostpaths)
 					}(ns)
 				}
 			}
