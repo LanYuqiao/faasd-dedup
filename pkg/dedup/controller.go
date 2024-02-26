@@ -90,11 +90,11 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 
 						}
 						wg.Wait()
-						log.Printf("%v", results)
 						slices.SortFunc[[]Tuple, Tuple](results, func(a, b Tuple) int { return int(a.inode - b.inode) })
-						preserved := results[0]
+						log.Printf("%v", results)
+						preserved := results[len(results)-1]
 						for i, t := range results {
-							if i == 0 {
+							if i == len(results)-1 {
 								continue
 							}
 							// See https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/loopclosure
@@ -112,7 +112,9 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 								}
 							}()
 						}
-
+						path2Inodes.mu.Lock()
+						path2Inodes.lookup[cpath] = []uint64{preserved.inode}
+						path2Inodes.mu.Unlock()
 					}(ns)
 				}
 			}
