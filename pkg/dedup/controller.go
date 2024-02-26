@@ -1,25 +1,31 @@
 package dedup
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os/exec"
+	"slices"
+	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 )
 
 var SnapshotsPath = "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/"
 
 type PathToInodes struct {
 	mu     sync.RWMutex
-	lookup map[string][]string
+	lookup map[string][]uint64
 }
 type InodeToPaths struct {
 	mu     sync.RWMutex
 	lookup map[string][]string
+}
+type Tuple struct {
+	inode uint64
+	path  string
 }
 
 var path2Inodes *PathToInodes
@@ -27,7 +33,7 @@ var path2Inodes *PathToInodes
 func init() {
 	path2Inodes = &PathToInodes{
 		mu:     sync.RWMutex{},
-		lookup: map[string][]string{},
+		lookup: map[string][]uint64{},
 	}
 }
 
@@ -48,38 +54,64 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 		fields := strings.Fields(line)
 		if len(fields) >= 5 && fields[4] == "REG" {
 			cpath := fields[len(fields)-1]
-			inode := fields[len(fields)-2]
+			inode, err := strconv.ParseUint(fields[len(fields)-2], 10, 64)
+			if err != nil {
+				log.Fatalf("Cannot parse %s to uint64", fields[len(fields)-2])
+			}
 			if !path2Inodes.Exist(cpath, inode) {
 				path2Inodes.Add(cpath, inode)
 			}
 			if ns, ok := path2Inodes.Lookup(cpath); ok {
 				if len(ns) > 1 {
 					log.Printf("Found more than one inode at path: %s, dedup triggered", cpath)
-					go func(inodes []string) {
-						var hostpaths []string
+					go func(inodes []uint64) {
+						var results []Tuple
 						var wg sync.WaitGroup
 						wg.Add(len(ns))
 						for _, n := range inodes {
-							var b bytes.Buffer
+							var b []byte
 							var err error
 
-							go func(node string, buf *bytes.Buffer) {
+							go func(node uint64) {
 								defer wg.Done()
-								cmd := exec.Command("find", SnapshotsPath, "-inum", node)
-								cmd.Stdout = buf
-								err = cmd.Run()
+								cmd := exec.Command("find", SnapshotsPath, "-inum", fmt.Sprintf("%d", node))
+								b, err = cmd.Output()
 								if err != nil {
-									log.Printf("Error when running find -inum %s", node)
+									log.Printf("Error when running find -inum %d", node)
 								}
 								// log.Printf("inode: %s, hostpath: %s", node, string(b))
-
-							}(n, &b)
+								results = append(results, Tuple{
+									inode: node,
+									path:  string(b),
+								})
+							}(n)
 							// log.Printf("inode: %s, hostpath: %s", n, string(b))
-							hostpaths = append(hostpaths, b.String())
 
 						}
 						wg.Wait()
-						log.Printf("cpath: %s\thostpaths: %v", cpath, hostpaths)
+						log.Printf("%v", results)
+						slices.SortFunc[[]Tuple, Tuple](results, func(a, b Tuple) int { return int(a.inode - b.inode) })
+						preserved := results[0]
+						for i, t := range results {
+							if i == 0 {
+								continue
+							}
+							// See https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/loopclosure
+							t := t
+							go func() {
+								victim := t.path
+								var err error
+								err = syscall.Rename(victim, fmt.Sprintf("%s-victim", victim))
+								if err != nil {
+									log.Panicf("Error when rename %s", victim)
+								}
+								err = syscall.Link(preserved.path, victim)
+								if err != nil {
+									log.Panicf("Error when link %s to %s", preserved.path, victim)
+								}
+							}()
+						}
+
 					}(ns)
 				}
 			}
@@ -91,14 +123,14 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("成功接收 lsof 输出"))
 }
 
-func (m *PathToInodes) Lookup(key string) (inodes []string, ok bool) {
+func (m *PathToInodes) Lookup(key string) (inodes []uint64, ok bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	inodes, ok = m.lookup[key]
 	return
 }
 
-func (m *PathToInodes) Exist(cpath string, inode string) bool {
+func (m *PathToInodes) Exist(cpath string, inode uint64) bool {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	inodes, ok := m.lookup[cpath]
@@ -108,7 +140,7 @@ func (m *PathToInodes) Exist(cpath string, inode string) bool {
 	return false
 }
 
-func (m *PathToInodes) Add(key string, value string) {
+func (m *PathToInodes) Add(key string, value uint64) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	exist, ok := m.lookup[key]
@@ -125,17 +157,17 @@ func (m *InodeToPaths) Lookup(key string) (paths []string, ok bool) {
 	return
 }
 
-func (m *InodeToPaths) Add(key string, value []string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	exist, ok := m.lookup[key]
-	if !ok || (ok && !Contain(exist, key)) {
-		m.lookup[key] = append(m.lookup[key], value...)
-		return
-	}
-}
+// func (m *InodeToPaths) Add(key string, value []string) {
+// 	m.mu.Lock()
+// 	defer m.mu.Unlock()
+// 	exist, ok := m.lookup[key]
+// 	if !ok || (ok && !Contain(exist, key)) {
+// 		m.lookup[key] = append(m.lookup[key], value...)
+// 		return
+// 	}
+// }
 
-func Contain(list []string, s string) bool {
+func Contain(list []uint64, s uint64) bool {
 	for _, v := range list {
 		if v == s {
 			return true
