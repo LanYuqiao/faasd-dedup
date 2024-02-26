@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -82,7 +83,7 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 								// log.Printf("inode: %s, hostpath: %s", node, string(b))
 								results = append(results, Tuple{
 									inode: node,
-									path:  string(b),
+									path:  filterTruePath(strings.Fields(string(b)), cpath),
 								})
 							}(n)
 							// log.Printf("inode: %s, hostpath: %s", n, string(b))
@@ -121,6 +122,15 @@ func ReceiveLSOF(w http.ResponseWriter, r *http.Request) {
 	// 返回成功响应
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("成功接收 lsof 输出"))
+}
+
+func filterTruePath(paths []string, cpath string) string {
+	for _, p := range paths {
+		if filepath.Base(cpath) == filepath.Base(p) {
+			return p
+		}
+	}
+	return ""
 }
 
 func (m *PathToInodes) Lookup(key string) (inodes []uint64, ok bool) {
